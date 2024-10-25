@@ -1,4 +1,4 @@
 #!/bin/bash
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python backend/api_server.py
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+python3 backend/api_server.py
