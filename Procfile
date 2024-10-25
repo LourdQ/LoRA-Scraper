@@ -1,1 +1,1 @@
-web: pip install -r requirements.txt && gunicorn --chdir backend api_server:appweb: gunicorn --chdir backend api_server:app
+web: python -m pip install --upgrade pip && pip install -r requirements.txt && python backend/api_server.py
