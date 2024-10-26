@@ -3,28 +3,30 @@ import requests
 from pyairtable import Table
 from datetime import datetime
 import time
-import sys
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.append(current_dir)
-
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Airtable Configuration
-AIRTABLE_TOKEN = os.getenv('AIRTABLE_TOKEN')
-AIRTABLE_BASE_ID = os.getenv('AIRTABLE_BASE_ID')
-AIRTABLE_LORA_TABLE = os.getenv('AIRTABLE_LORA_TABLE', 'LORA Models')
-AIRTABLE_EXAMPLES_TABLE = os.getenv('AIRTABLE_EXAMPLES_TABLE', 'Generation Examples')
-
-
 class LoRAScraper:
     def __init__(self):
         self.civitai_api = "https://civitai.com/api/v1"
-        self.lora_table = Table(AIRTABLE_TOKEN, AIRTABLE_BASE_ID, AIRTABLE_LORA_TABLE)
-        self.examples_table = Table(AIRTABLE_TOKEN, AIRTABLE_BASE_ID, AIRTABLE_EXAMPLES_TABLE)
+        
+        # Debug print environment variables
+        print("Environment Variables:")
+        print(f"AIRTABLE_TOKEN: {'Set' if os.getenv('AIRTABLE_TOKEN') else 'Not Set'}")
+        print(f"AIRTABLE_BASE_ID: {'Set' if os.getenv('AIRTABLE_BASE_ID') else 'Not Set'}")
+        print(f"AIRTABLE_LORA_TABLE: {os.getenv('AIRTABLE_LORA_TABLE', 'Not Set')}")
+        print(f"AIRTABLE_EXAMPLES_TABLE: {os.getenv('AIRTABLE_EXAMPLES_TABLE', 'Not Set')}")
+        
+        # Validate environment variables
+        token = os.getenv('AIRTABLE_TOKEN')
+        base_id = os.getenv('AIRTABLE_BASE_ID')
+        
+        if not token or not base_id:
+            raise ValueError("AIRTABLE_TOKEN and AIRTABLE_BASE_ID must be set in environment variables")
+            
+        self.lora_table = Table(token, base_id, os.getenv('AIRTABLE_LORA_TABLE', 'LORA Models'))
+        self.examples_table = Table(token, base_id, os.getenv('AIRTABLE_EXAMPLES_TABLE', 'Generation Examples'))
 
     def fetch_model(self, model_id):
         """Fetch model data from CivitAI"""
