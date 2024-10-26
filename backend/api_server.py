@@ -22,7 +22,7 @@ CORS(app, origins=[
     "*"  # For initial testing - we'll remove this later
 ])
 
-@app.route('/health', methods=['GET'])
+@app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({"status": "healthy"}), 200
 
