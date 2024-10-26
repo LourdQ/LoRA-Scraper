@@ -2,7 +2,11 @@ import requests
 from pyairtable import Table
 from datetime import datetime
 import time
-from .config import *
+
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from backend.config import *
 
 class LoRAScraper:
     def __init__(self):

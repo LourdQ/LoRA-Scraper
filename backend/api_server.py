@@ -1,14 +1,16 @@
 
 # Production deployment version
+# Production deployment version
 import os
-
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_cors import CORS
 from datetime import datetime
 import threading
 import time
 import json
-from lora_scraper import LoRAScraper
+from backend.lora_scraper import LoRAScraper
 
 app = Flask(__name__)
 CORS(app, origins=[
