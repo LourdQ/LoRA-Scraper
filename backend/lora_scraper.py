@@ -2,7 +2,7 @@ import requests
 from pyairtable import Table
 from datetime import datetime
 import time
-from config import *
+from .config import *
 
 class LoRAScraper:
     def __init__(self):
