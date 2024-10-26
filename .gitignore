@@ -16,21 +16,13 @@
 # Environment files
 .env*.local
 .env
-<<<<<<< HEAD
-config.py
-=======
->>>>>>> cb882dff8ef56adfba2bac880e28b02308b41697
 
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 venv/
-.env
-<<<<<<< HEAD
 backend/__pycache__/
-=======
->>>>>>> cb882dff8ef56adfba2bac880e28b02308b41697
 
 # VS Code
 .vscode/
