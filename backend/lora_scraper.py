@@ -1,12 +1,14 @@
+import os
 import requests
 from pyairtable import Table
 from datetime import datetime
 import time
-
-import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from backend.config import *
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+from config import *
+
 
 class LoRAScraper:
     def __init__(self):
