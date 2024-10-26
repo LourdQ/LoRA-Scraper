@@ -7,7 +7,17 @@ import sys
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.append(current_dir)
-from config import *
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Airtable Configuration
+AIRTABLE_TOKEN = os.getenv('AIRTABLE_TOKEN')
+AIRTABLE_BASE_ID = os.getenv('AIRTABLE_BASE_ID')
+AIRTABLE_LORA_TABLE = os.getenv('AIRTABLE_LORA_TABLE', 'LORA Models')
+AIRTABLE_EXAMPLES_TABLE = os.getenv('AIRTABLE_EXAMPLES_TABLE', 'Generation Examples')
 
 
 class LoRAScraper:
