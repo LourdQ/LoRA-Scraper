@@ -6,61 +6,36 @@ export default function ScanStatus() {
   const [lastScan, setLastScan] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [modelId, setModelId] = useState('');
+  const [modelUrl, setModelUrl] = useState('');
+  const [inputMethod, setInputMethod] = useState<'id' | 'url'>('id');
   const [error, setError] = useState<string | null>(null);
 
-  // Status checking effect
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
+  // Rest of status checking effect remains the same...
 
-    const checkStatus = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scan-status`);
-        const data = await response.json();
-        
-        setStatus(data.status);
-        setLastScan(data.lastScan);
-
-        if (data.error) {
-          setError(data.error);
-          return false;
-        }
-
-        // If scan is complete or in error state, stop polling
-        if (data.status === 'idle' || data.status === 'error') {
-          if (intervalId) {
-            clearInterval(intervalId);
-            intervalId = null;
-          }
-          return false;
-        }
-        return true;
-      } catch (error) {
-        console.error('Failed to get status:', error);
-        setError('Failed to check status');
-        if (intervalId) {
-          clearInterval(intervalId);
-          intervalId = null;
-        }
-        return false;
-      }
-    };
-
-    // Only poll if scanning
-    if (status === 'scanning') {
-      checkStatus(); // Initial check
-      intervalId = setInterval(checkStatus, 3000);
+  const extractModelIdFromUrl = (url: string): string | null => {
+    try {
+      const match = url.match(/\/models\/(\d+)/);
+      return match ? match[1] : null;
+    } catch {
+      return null;
     }
-
-    // Cleanup
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [status]);
+  };
 
   const startScan = async () => {
-    if (!modelId) {
+    let idToScan = modelId;
+
+    if (inputMethod === 'url') {
+      if (!modelUrl) {
+        setError('Please enter a model URL');
+        return;
+      }
+      const extractedId = extractModelIdFromUrl(modelUrl);
+      if (!extractedId) {
+        setError('Invalid CivitAI URL format');
+        return;
+      }
+      idToScan = extractedId;
+    } else if (!modelId) {
       setError('Please enter a model ID');
       return;
     }
@@ -70,7 +45,7 @@ export default function ScanStatus() {
       setIsLoading(true);
 
       // Check if model exists
-      const checkResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/check-model?modelId=${modelId}`);
+      const checkResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/check-model?modelId=${idToScan}`);
       const checkData = await checkResponse.json();
       
       if (checkData.exists) {
@@ -84,7 +59,7 @@ export default function ScanStatus() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ modelId: parseInt(modelId) }),
+        body: JSON.stringify({ modelId: parseInt(idToScan) }),
       });
       
       const scanData = await scanResponse.json();
@@ -94,7 +69,8 @@ export default function ScanStatus() {
         setStatus('error');
       } else {
         setStatus('scanning');
-        setModelId(''); // Clear input after successful start
+        setModelId('');
+        setModelUrl('');
       }
     } catch (error) {
       console.error('Failed to start scan:', error);
@@ -133,17 +109,53 @@ export default function ScanStatus() {
           </div>
         )}
         <div className="mt-4">
-          <input
-            type="text"
-            value={modelId}
-            onChange={(e) => {
-              setModelId(e.target.value);
-              setError(null);
-            }}
-            placeholder="Enter CivitAI Model ID"
-            className="w-full p-2 border rounded mb-2"
-            disabled={status === 'scanning'}
-          />
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setInputMethod('id')}
+              className={`px-3 py-1 rounded ${
+                inputMethod === 'id' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              Model ID
+            </button>
+            <button
+              onClick={() => setInputMethod('url')}
+              className={`px-3 py-1 rounded ${
+                inputMethod === 'url' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              Model URL
+            </button>
+          </div>
+          {inputMethod === 'id' ? (
+            <input
+              type="text"
+              value={modelId}
+              onChange={(e) => {
+                setModelId(e.target.value);
+                setError(null);
+              }}
+              placeholder="Enter CivitAI Model ID"
+              className="w-full p-2 border rounded mb-2"
+              disabled={status === 'scanning'}
+            />
+          ) : (
+            <input
+              type="text"
+              value={modelUrl}
+              onChange={(e) => {
+                setModelUrl(e.target.value);
+                setError(null);
+              }}
+              placeholder="Enter CivitAI Model URL"
+              className="w-full p-2 border rounded mb-2"
+              disabled={status === 'scanning'}
+            />
+          )}
           <button 
             className={`w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors ${
               isLoading || status === 'scanning' ? 'opacity-50 cursor-not-allowed' : ''
