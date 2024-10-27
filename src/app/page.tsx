@@ -1,44 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import ResultsList from '../components/ResultsList';
+import ScanStatus from '../components/ScanStatus';
 
 export default function Home() {
-  const [modelId, setModelId] = useState('');
-  const [status, setStatus] = useState(null);
-
-  const handleScan = async () => {
-    try {
-      const response = await fetch('https://lora-scraper-production.up.railway.app/api/start-scan', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ modelId: parseInt(modelId) }),
-      });
-      const data = await response.json();
-      setStatus(data);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-
   return (
-    <main className="p-4">
-      <h1>LoRA Scraper</h1>
-      <div>
-        <input
-          type="text"
-          value={modelId}
-          onChange={(e) => setModelId(e.target.value)}
-          placeholder="Enter Model ID"
-        />
-        <button onClick={handleScan}>Scan</button>
+    <main className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <h1 className="text-3xl font-bold mb-8">LoRA Scraper</h1>
+        <div className="grid gap-6 md:grid-cols-2">
+          <ScanStatus />
+          <ResultsList />
+        </div>
       </div>
-      {status && (
-        <pre>
-          {JSON.stringify(status, null, 2)}
-        </pre>
-      )}
     </main>
   );
 }
